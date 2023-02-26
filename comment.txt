@@ -1,0 +1,8 @@
+Customers chứa id customer, Mac address và ngày tạo acc
+CustomerService chứa id người dùng, id services, Amount và ngày sử dụng (có thể đây là gói đăng kí)
+MV_PropertiesShowVN chứa id movie, topic, title, release date, actors, directors, producers, publish country, duration, isDRM
+
+Log_BHD_MovieID chứa log: id customer, id movie, FTYPE, REALTIMEPLAYING, DATE, folder, Utype
+Log_Fimplus_MovieID chứa log: tương tự Log_BHD_MovieID
+
+Log_Get_DRM_List chứa ngày lấy DRM Key của từng Customer: customerid, Date, MAC

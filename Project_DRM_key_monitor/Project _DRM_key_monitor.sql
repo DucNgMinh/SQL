@@ -33,7 +33,7 @@ from SalesLT.Log_Get_DRM_List
 group by Date) b on a.date = b.date
 
 -- output
-select ISNULL(a.date, b.Date), ISNULL(a.Number_of_customer, 0) + ISNULL(b.Number_of_customer, 0)
+select ISNULL(a.date, b.Date) as Date, ISNULL(a.Number_of_customer, 0) + ISNULL(b.Number_of_customer, 0) as Number_of_customer
 from ( -- tính số lần xem phim Film_Plus và Film_BHD là DRM và groupby theo date
         select date, count(MovieId) as Number_of_customer
         from #merge_log_customer right join #Is_DRM on MovieId = id
