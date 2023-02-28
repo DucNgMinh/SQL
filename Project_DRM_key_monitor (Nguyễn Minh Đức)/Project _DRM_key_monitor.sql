@@ -13,7 +13,6 @@ into #Is_DRM
 from SalesLT.MV_PropertiesShowVN
 where isDRM = 1
 
--- merge 2 table Film_Plus và Film_BHD
 select date, count(distinct CustomerID) as Number_of_FilmPlus
 into #FilmPlus_count
 from (select CustomerID, MovieId, FORMAT(date, 'yyyy-MM-dd') as date
