@@ -14,32 +14,26 @@ from SalesLT.MV_PropertiesShowVN
 where isDRM = 1
 
 -- merge 2 table Film_Plus và Film_BHD
-select *
-into #merge_log_customer
-from ((select CustomerID, MovieId, FORMAT(date, 'yyyy-MM-dd') as date
-        from SalesLT.Log_Fimplus_MovieID)
-        union
-        (select CustomerID, MovieId, FORMAT(date, 'yyyy-MM-dd') as date
-        from SalesLT.Log_BHD_MovieID)) a
+select date, count(distinct CustomerID) as Number_of_FilmPlus
+into #FilmPlus_count
+from (select CustomerID, MovieId, FORMAT(date, 'yyyy-MM-dd') as date
+        from SalesLT.Log_Fimplus_MovieID right join #Is_DRM on MovieId = id) a
+group by date
 
--- test join
-select a.date, a.Number_of_customer, b.date,  b.Number_of_customer
-from    (select date, count(MovieId) as Number_of_customer
-        from #merge_log_customer right join #Is_DRM on MovieId = id
-        group by date) a
-full join
-(select Date, count(Mac) as Number_of_customer
+select date, count(distinct CustomerID) as Number_of_Moive
+into #BHD_Movie_count
+from (select CustomerID, MovieId, FORMAT(date, 'yyyy-MM-dd') as date
+        from SalesLT.Log_BHD_MovieID right join #Is_DRM on MovieId = id) a
+group by date
+
+select Date, count(distinct Mac) as Number_of_Get_DRM
+into #Get_DRM_count
 from SalesLT.Log_Get_DRM_List
-group by Date) b on a.date = b.date
+group by Date
 
 -- output
-select ISNULL(a.date, b.Date) as Date, ISNULL(a.Number_of_customer, 0) + ISNULL(b.Number_of_customer, 0) as Number_of_customer
-from ( -- tính số lần xem phim Film_Plus và Film_BHD là DRM và groupby theo date
-        select date, count(MovieId) as Number_of_customer
-        from #merge_log_customer right join #Is_DRM on MovieId = id
-        group by date) a
-full join
-    ( -- tính số lần xem phim gói là DRM
-    select Date, count(Mac) as Number_of_customer
-    from SalesLT.Log_Get_DRM_List
-    group by Date) b on a.date = b.Date
+select ISNULL(a.DATE , #Get_DRM_count.Date), a.Number_of_FilmPlus, a.Number_of_Moive, #Get_DRM_count.Number_of_Get_DRM
+from( select ISNULL(#FilmPlus_count.date, BMc.Date) as DATE, #FilmPlus_count.Number_of_FilmPlus , BMc.Number_of_Moive
+    from #FilmPlus_count full join #BHD_Movie_count BMc on #FilmPlus_count.date = BMc.date) a
+full join #Get_DRM_count on a.DATE = #Get_DRM_count.Date
+
